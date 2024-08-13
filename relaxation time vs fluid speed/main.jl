@@ -33,7 +33,7 @@ model = modelInit(; fluidVelocity = u, x = x, walledDimensions = [2], solidNodes
     relaxationTimeRatio = 0.8, # τ/Δt > 1 → under-relaxation, τ/Δt = 1 → full relaxation, 0.5 < τ/Δt < 1 → over-relaxation, τ/Δt < 0.5 → unstable
 );
 
-@time for relaxationTimeRatio in range(0.5, stop = 2, length = 2)
+@time for relaxationTimeRatio in range(0.5, stop = 10, length = 50)
     @show relaxationTimeRatio
     model = modelInit(; fluidVelocity = u, x = x, walledDimensions = [2], solidNodes = solidNodes,
         relaxationTimeRatio = relaxationTimeRatio, # τ/Δt > 1 → under-relaxation, τ/Δt = 1 → full relaxation, 0.5 < τ/Δt < 1 → over-relaxation, τ/Δt < 0.5 → unstable
