@@ -12,7 +12,7 @@ goal:
 
 2.  α must be found as function of τ
 
-3.  this should be repeated with varying force densities
+Note: this should be repeated with varying force densities!
 
 =============================================================================================
 ========================================================================================== =#
@@ -23,11 +23,12 @@ using LBMengine
 using CairoMakie
 using DelimitedFiles
 using Dates
+using LsqFit
 
 norm(v) = v.*v |> sum |> sqrt
 mean(v) = sum(v)/length(v)
 
-# 0.  create poiseuille flow initial conditions
+# 0.  prepare poiseuille flow initial conditions
 
 len = 100;
 x = range(-1, stop = 1, length = len);
@@ -64,8 +65,8 @@ time = range(initialModel.spaceTime.Δt, stop = simulationTime, step = initialMo
 τs = range(0.6, stop = 10, length = 100)
 Fs = range(0.0, stop = 2.0e-3, length = 5)
 
-#= for F in Fs[2:3] =#
-for F in Fs[4:5]
+# warning: this step took 35+ hours to run! Run this at your own peril!
+for F in Fs
     dirName = "F = $(F)"
     mkdir("exponential decay to equilibrium/outputData/$(dirName)")
     @time for τ in τs
@@ -93,18 +94,29 @@ end
 
 # 2. α must be found as function of τ
 
-# plotting some results
-for fId in 1:4, id in [1; 3; 5; 10:10:100]
-    τs[id]
-    F = Fs[fId]
-    dirName = "F = $(F)"
-    M = readdlm("exponential decay to equilibrium/outputData/$(dirName)/relaxationTimeRatio $(τs[id]).csv", ',');
-    fig = Figure();
-    ax = Axis(fig[1,1], title = "fluid speed, τ/Δt = $(τs[id])");
-    ax.xlabel = "t"; ax.ylabel = "|u|";
-    ylims!(ax,0, 0.004);
-    lines!(ax, M)
-    save("figs/$(today())/speedVsTau/F = $(F) id $(id).png", fig)
+# defining the model
+@. exponentialModel(x, p) = p[1] * exp(-x * p[2]) + p[3];
+p0 = [0.5, 0.5, 0.5];
+
+# fitting the data and saving α vs τ (alternatively, one could plot the results)
+c = 1
+for fId in eachindex(Fs)
+    αs = [];
+    for id in eachindex(τs)
+        τ, F = τs[id], Fs[fId]; dirName = "F = $(F)"
+        M = readdlm("exponential decay to equilibrium/outputData/F = $(F)/relaxationTimeRatio $(τs[id]).csv", ',');
+        t, u = M |> eachrow |> rows -> ([m[1] for m in rows], [m[2] for m in rows]);
+        fit = curve_fit(exponentialModel, t, u, p0)
+        append!(αs, fit.param[2])
+    end
+    open("exponential decay to equilibrium/outputData/alphaVsTau - F = $(F).csv", "w") do io
+        writedlm(io, [τs αs], ',')
+    end;
+    #= fig = Figure(); =#
+    #= ax = Axis(fig[1,1], xticks = 1:10, title = "u̅(t) = A exp(-αt) + B; finding α as a function of τ. |F| = $(F)"); =#
+    #= ax.xlabel = "τ"; ax.ylabel = "α"; =#
+    #= ylims!(ax,0, 0.6); =#
+    #= lines!(ax, τs, αs) =#
+    #= save("figs/$(today())/alphaVsTau/$(c) - F = $(F).png", fig) =#
+    c += 1;
 end
-
-
