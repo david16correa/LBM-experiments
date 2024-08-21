@@ -1,4 +1,3 @@
-
 #= ==========================================================================================
 =============================================================================================
 
@@ -62,6 +61,7 @@ initialModel = modelInit(;
 
 simulationTime = 60
 time = range(initialModel.spaceTime.Δt, stop = simulationTime, step = initialModel.spaceTime.Δt) |> collect;
+
 τs = range(0.6, stop = 10, length = 100)
 Fs = range(0.0, stop = 2.0e-3, length = 5)
 
@@ -98,12 +98,13 @@ end
 @. exponentialModel(x, p) = p[1] * exp(-x * p[2]) + p[3];
 p0 = [0.5, 0.5, 0.5];
 
-# fitting the data and saving α vs τ (alternatively, one could plot the results)
+# fitting the data and saving α vs τ
 c = 1
 for fId in eachindex(Fs)
     αs = [];
+    F = Fs[fId];
     for id in eachindex(τs)
-        τ, F = τs[id], Fs[fId]; dirName = "F = $(F)"
+        τ = τs[id]; dirName = "F = $(F)"
         M = readdlm("exponential decay to equilibrium/outputData/F = $(F)/relaxationTimeRatio $(τs[id]).csv", ',');
         t, u = M |> eachrow |> rows -> ([m[1] for m in rows], [m[2] for m in rows]);
         fit = curve_fit(exponentialModel, t, u, p0)
@@ -112,11 +113,21 @@ for fId in eachindex(Fs)
     open("exponential decay to equilibrium/outputData/alphaVsTau - F = $(F).csv", "w") do io
         writedlm(io, [τs αs], ',')
     end;
-    #= fig = Figure(); =#
-    #= ax = Axis(fig[1,1], xticks = 1:10, title = "u̅(t) = A exp(-αt) + B; finding α as a function of τ. |F| = $(F)"); =#
-    #= ax.xlabel = "τ"; ax.ylabel = "α"; =#
-    #= ylims!(ax,0, 0.6); =#
-    #= lines!(ax, τs, αs) =#
-    #= save("figs/$(today())/alphaVsTau/$(c) - F = $(F).png", fig) =#
-    c += 1;
 end
+
+# plotting the results; finding the linear fit
+@. linearModel(x, p) = p[1] * x + p[2];
+p0 = [0.5, 0.5];
+fig = Figure();
+ax = Axis(fig[1:5,1:5], xticks = 1:10, title = "u̅(t) = A exp(-αt) + B; finding α as a function of τ.");
+ax.xlabel = "τ"; ax.ylabel = "α";
+ylims!(ax,0, 0.6);
+for fId in eachindex(Fs)[end:-1:1]
+    F = Fs[fId];
+    M = readdlm("exponential decay to equilibrium/outputData/alphaVsTau - F = $(F).csv", ',')
+    τ, α = M |> eachrow |> rows -> ([m[1] for m in rows], [m[2] for m in rows]);
+    fit = curve_fit(linearModel, τ, α, p0)
+    lines!(ax, M, label = "|F| = $(F), m = $(fit.param[1] |> x -> round(x, digits = 2))")
+end
+axislegend(ax, position = :rb)
+save("figs/$(today())/alphaVsTau $(Time(now())).png", fig)
