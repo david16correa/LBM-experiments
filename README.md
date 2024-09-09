@@ -1,5 +1,5 @@
 # LBM-experiments
-A repository containing all experiments made with [LBMengine.jl](https://github.com/david16correa/LBMengine.jl)
+A repository containing all experiments I've made with [LBMengine.jl](https://github.com/david16correa/LBMengine.jl)
 
 | ![bigWalls1](assets/bigWallsFluidVelocity.jpg) | ![shpere1](assets/sphereFluidVelocity.jpg) | ![walls1](assets/wallsFluidVelocity.jpg) |
 |-----|------|-----|
