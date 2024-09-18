@@ -11,7 +11,7 @@ relaxation time
 ========================================================================================== =#
 
 # preamble
-using Pkg; Pkg.activate("."); 
+using Pkg; Pkg.activate(".");
 using LBMengine
 using CairoMakie
 
