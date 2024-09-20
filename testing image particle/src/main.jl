@@ -7,13 +7,16 @@ preamble
 # Environment
 using Pkg; Pkg.activate(".");
 
-# add local version of LBMengine.jl
+# add LBMengine.jl to the environment
 #= ] dev ../../LBMengine.jl =#
 
 # packages
 using LBMengine, CairoMakie, Dates, LinearAlgebra
 
 include("src/params.jl")
+
+outputDir = "data.lbm/movingParticle"
+mkdir(outputDir)
 
 #= ==========================================================================================
 =============================================================================================
@@ -41,6 +44,11 @@ addBead!(model;
 @time plotMassDensity(model);
 @time plotFluidVelocity(model);
 
+<<<<<<< HEAD
+=======
+mv("output.lbm", "$(outputDir)/L")
+
+>>>>>>> dev
 #= ==========================================================================================
 =============================================================================================
 R - cerca de la pared
@@ -68,6 +76,11 @@ addBead!(modelClose2wall;
 @time plotMassDensity(modelClose2wall);
 @time plotFluidVelocity(modelClose2wall);
 
+<<<<<<< HEAD
+=======
+mv("output.lbm", "$(outputDir)/R")
+
+>>>>>>> dev
 #= ==========================================================================================
 =============================================================================================
 I - partícula imagen
