@@ -20,8 +20,8 @@ massDensity = 1.5;
 radius = 0.4;
 position = [0., 0];
 coupleTorques = false;
-coupleForces = false;
+coupleForces = true;
 angularVelocity = 0.01;
 
 # simulation
-simulationTime = 30;
+simulationTime = 60;
