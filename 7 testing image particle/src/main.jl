@@ -4,8 +4,13 @@ preamble
 =============================================================================================
 ========================================================================================== =#
 
+# ensuring the working directory is "10 rotating sphere in a box"
+cd(@__DIR__)  # Change working directory to the location of the script
+cd("..") # change the working directory to its parent directoyry
+path = pwd() # save the path of the current working directory to ensure it's always used
+
 # Environment
-using Pkg; Pkg.activate(".");
+using Pkg; Pkg.activate(path);
 
 # add LBMengine.jl to the environment
 #= ] dev ../../LBMengine.jl =#
@@ -13,7 +18,8 @@ using Pkg; Pkg.activate(".");
 # packages
 using LBMengine
 
-include("src/params.jl")
+# parameters
+include("$path/src/params.jl")
 
 #= ==========================================================================================
 =============================================================================================
@@ -21,7 +27,7 @@ Ladd
 =============================================================================================
 ========================================================================================== =#
 
-outputDir = "data.lbm/ladd/movingParticle"
+outputDir = "$path/data.lbm/ladd/movingParticle"
 run(`mkdir -p $outputDir`)
 
 #= ==========================================================================================
@@ -51,7 +57,7 @@ addBead!(model;
 @time plotMassDensity(model);
 @time plotFluidVelocity(model);
 
-mv("output.lbm", "$(outputDir)/L")
+mv("$path/output.lbm", "$(outputDir)/L")
 
 #= ==========================================================================================
 =============================================================================================
@@ -81,7 +87,7 @@ addBead!(modelClose2wall;
 @time plotMassDensity(modelClose2wall);
 @time plotFluidVelocity(modelClose2wall);
 
-mv("output.lbm", "$(outputDir)/R")
+mv("$path/output.lbm", "$(outputDir)/R")
 
 #= ==========================================================================================
 =============================================================================================
@@ -89,7 +95,7 @@ PSM
 =============================================================================================
 ========================================================================================== =#
 
-outputDir = "data.lbm/psm/movingParticle"
+outputDir = "$path/data.lbm/psm/movingParticle"
 run(`mkdir -p $outputDir`)
 
 #= ==========================================================================================
@@ -119,7 +125,7 @@ addBead!(model;
 @time plotMassDensity(model);
 @time plotFluidVelocity(model);
 
-mv("output.lbm", "$(outputDir)/L")
+mv("$path/output.lbm", "$(outputDir)/L")
 
 #= ==========================================================================================
 =============================================================================================
@@ -149,5 +155,5 @@ addBead!(modelClose2wall;
 @time plotMassDensity(modelClose2wall);
 @time plotFluidVelocity(modelClose2wall);
 
-mv("output.lbm", "$(outputDir)/R")
+mv("$path/output.lbm", "$(outputDir)/R")
 
