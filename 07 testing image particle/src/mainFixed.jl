@@ -55,4 +55,4 @@ addBead!(model;
 sigma = viscousStressTensor(model)
 writeTensor(model, sigma, "stressTensor")
 
-mv("$path/output.lbm", "$(outputDir)/fixedParticle")
+mv("$path/output.lbm", "$(outputDir)/fixedParticle_finer")

@@ -5,7 +5,7 @@ params
 ========================================================================================== =#
 
 # space
-x = range(-2, stop = 2, length = 201);
+x = range(-2, stop = 2, length = 500);
 walledDimensions = [1,2];
 
 # fluid
