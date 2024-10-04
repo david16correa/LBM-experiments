@@ -13,10 +13,10 @@ relaxationTimeRatio = 1.1;
 isFluidCompressible = false;
 
 # wall
-solidNodes = [j < -0.7 for i in x, j in x];
+solidNodes = [j < -0.6 for i in x, j in x];
 
 # particle
-massDensity = 1.5;
+massDensity = 1.;
 radius = 0.4;
 position = [0., 0];
 coupleTorques = false;
