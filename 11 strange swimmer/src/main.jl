@@ -21,7 +21,7 @@ using LBMengine
 #= using CairoMakie =#
 
 # parameters
-include("$path/src/params.jl")
+include("$path/src/params_2.jl")
 
 # special functions for this experiment
 include("$path/src/aux.jl")
@@ -60,4 +60,4 @@ addBead!(model;
 sigma = viscousStressTensor(model)
 writeTensor(model, sigma, "stressTensor")
 
-mv("$path/output.lbm", "$(outputDir)/attempt 02")
+mv("$path/output.lbm", "$(outputDir)/attempt 03")
