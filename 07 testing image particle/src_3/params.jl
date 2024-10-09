@@ -33,16 +33,13 @@ params
 ========================================================================================== =#
 
 # space
-xmax = 6 
+xmax = 6
 x = range(-xmax, stop = xmax, step = 0.01);
 walledDimensions = [1,2];
 
 # fluid
 relaxationTimeRatio = 1.1;
 isFluidCompressible = false;
-
-# wall
-#= solidNodes = [j < -0.6 for i in x, j in x]; =#
 
 # particle
 massDensity = 1.;

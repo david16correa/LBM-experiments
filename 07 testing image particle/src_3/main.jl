@@ -4,7 +4,7 @@ preamble
 =============================================================================================
 ========================================================================================== =#
 
-# ensuring the working directory is "10 rotating sphere in a box"
+# ensuring the working directory is the correct one
 cd(@__DIR__)  # Change working directory to the location of the script
 cd("..") # change the working directory to its parent directoyry
 path = pwd() # save the path of the current working directory to ensure it's always used
@@ -30,15 +30,14 @@ R - cerca de la pared
 =============================================================================================
 ========================================================================================== =#
 
-println("model is being defined"); flush(stdout);
+println("initializing model..."); flush(stdout);
 
 model = modelInit(;
     x = x,
     relaxationTimeRatio = relaxationTimeRatio,
     walledDimensions = walledDimensions,
     isFluidCompressible = isFluidCompressible,
-    #= solidNodes = solidNodes, =#
-    saveData = false,
+    saveData = true,
 );
 addBead!(model;
     massDensity = massDensity,
@@ -49,17 +48,17 @@ addBead!(model;
     angularVelocity = angularVelocity
 );
 
-println("model is now defined"); flush(stdout);
+println("model initialized!"); flush(stdout);
 
 @time LBMpropagate!(model; verbose = true, simulationTime = simulationTime, ticksBetweenSaves = ticksBetweenSaves);
 @time plotMassDensity(model);
 @time plotFluidVelocity(model);
 
+println("finding stress tensor..."); flush(stdout);
+
 sigma = viscousStressTensor(model)
 writeTensor(model, sigma, "stressTensor")
 
+println("stress tensor found!"); flush(stdout);
+
 mv("$path/output.lbm", "$(outputDir)/R")
-
-model.fluidVelocity |> M -> [m[1] for m in M] |> M -> heatmap(M, axis = (aspect = 1,))
-
-model.particles[1].nodeVelocity |> M -> [m[2] for m in M] |> M -> heatmap(M, axis = (aspect = 1,))
