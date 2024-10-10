@@ -5,9 +5,9 @@ params - larger sphere
 ========================================================================================== =#
 
 # space
-x_space = range(-2, stop = 2, length = 101);
-x = 1.:length(x_space)
-walledDimensions = [];
+x_space = range(-2, stop = 2, length = 501);
+x = 1:length(x_space)
+walledDimensions = [1, 2];
 
 # fluid
 relaxationTimeRatio = 1.1;
@@ -25,4 +25,4 @@ coupleForces = false;
 angularVelocity = 0.01*step(x_space)/step(x);
 
 # simulation
-simulationTime = 30;
+simulationTime = 60 * 100;

@@ -1,3 +1,3 @@
-# strange swimmer
+# lattice units test
 
-In recent experiments several issues have come up regarding the swimming mechanics of my microswimmers. This experiment attempts to verify the momentum-transfer routines are working properly through the implementation of artificial swimmers that, in essence, propel themselves. Briefly put, this is a sanity check.
+Throughout the development of LBMengine.jl, physical units have always been (mis)used. This should not be done due to stability issues that could (should) come up. It's long been in my to-do list to fix this, and the swimmer has given me so much trouble that I'm now running a (questionable) test with lattice units. This is the result.

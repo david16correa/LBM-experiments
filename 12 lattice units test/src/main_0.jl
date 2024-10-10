@@ -4,10 +4,9 @@ preamble
 =============================================================================================
 ========================================================================================== =#
 
-# ensuring the working directory is "10 rotating sphere in a box"
+# ensuring the working directory is the correct one
 cd(@__DIR__)  # Change working directory to the location of the script
 cd("..") # change the working directory to its parent directoyry
-
 path = pwd() # save the path of the current working directory to ensure it's always used
 
 # environment
@@ -18,13 +17,9 @@ using Pkg; Pkg.activate(path);
 
 # packages
 using LBMengine
-#= using CairoMakie =#
 
 # parameters
-include("$path/src/params.jl")
-
-# special functions for this experiment
-#= include("$path/src/aux.jl") =#
+include("$path/src/params_0.jl")
 
 # directory for our output
 outputDir = "$path/data.lbm/src_0"
@@ -36,6 +31,8 @@ run(`mkdir -p $outputDir`)
 main
 =============================================================================================
 ========================================================================================== =#
+
+println("initializing model..."); flush(stdout);
 
 model = modelInit(;
     x = x,
@@ -54,15 +51,17 @@ addBead!(model;
     angularVelocity = angularVelocity,
 );
 
-@time LBMpropagate!(model; simulationTime = simulationTime);
+println("model initialized!"); flush(stdout);
+
+@time LBMpropagate!(model; verbose = true, simulationTime = simulationTime);
 @time plotMassDensity(model);
 @time plotFluidVelocity(model);
+
+println("finding stress tensor..."); flush(stdout);
 
 sigma = viscousStressTensor(model)
 writeTensor(model, sigma, "stressTensor")
 
-mv("$path/output.lbm", "$(outputDir)")
+println("stress tensor found!"); flush(stdout);
 
-
-dims = 2
-massDensity = [length(x) for _ in 1:dims] |> v -> ones(v...)
+mv("$path/output.lbm", "$(outputDir)/R")
