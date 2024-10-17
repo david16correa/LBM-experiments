@@ -1,13 +1,0 @@
-The latest version of Julia in the `release` channel is 1.11.0+0.x64.linux.gnu. You currently have `1.10.5+0.x64.linux.gnu` installed. Run:
-
-  juliaup update
-
-in your terminal shell to install Julia 1.11.0+0.x64.linux.gnu and update the `release` channel to that version.
-initializing model...
-model initialized!
- t = 1.0 t = 123.0 t = 246.0 t = 368.0 t = 491.0 t = 613.0 t = 736.0 t = 858.0 t = 980.0 t = 1103.0 t = 1225.0 t = 1348.0 t = 1470.0 t = 1593.0 t = 1715.0 t = 1837.0 t = 1960.0 t = 2082.0 t = 2205.0 t = 2327.0 t = 2450.0 t = 2572.0 t = 2694.0 t = 2817.0 t = 2939.0 t = 3062.0 t = 3184.0 t = 3307.0 t = 3429.0 t = 3551.0 t = 3674.0 t = 3796.0 t = 3919.0 t = 4041.0 t = 4164.0 t = 4286.0 t = 4408.0 t = 4531.0 t = 4653.0 t = 4776.0 t = 4898.0 t = 5021.0 t = 5143.0 t = 5265.0 t = 5388.0 t = 5510.0 t = 5633.0 t = 5755.0 t = 5878.0 t = 6000.07077.811806 seconds (45.72 G allocations: 6.245 TiB, 33.21% gc time, 0.04% compilation time)
- 10.541745 seconds (9.60 M allocations: 671.041 MiB, 0.94% gc time, 89.36% compilation time: 4% of which was recompilation)
-  4.377430 seconds (4.96 M allocations: 356.953 MiB, 1.56% gc time, 94.98% compilation time)
-finding stress tensor...
-stress tensor found!
-  Activating project at `~/Dropbox/tesis/LBM-experiments/12 lattice units test`

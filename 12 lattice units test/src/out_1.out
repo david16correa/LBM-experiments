@@ -1,8 +1,0 @@
-The latest version of Julia in the `release` channel is 1.11.0+0.x64.linux.gnu. You currently have `1.10.5+0.x64.linux.gnu` installed. Run:
-
-  juliaup update
-
-in your terminal shell to install Julia 1.11.0+0.x64.linux.gnu and update the `release` channel to that version.
-initializing model...
-model initialized!
- t = 1.0
