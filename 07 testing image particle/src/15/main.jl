@@ -68,4 +68,4 @@ writeTensor(model, sigma, "stressTensor")
 
 println("moving data..."); flush(stdout);
 
-mv("$srcPath/output.lbm", "$(outputDir)/swimming")
+mv("$srcPath/output.lbm", "$(outputDir)/fixed")
