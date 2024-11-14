@@ -17,8 +17,8 @@ function moveParticles!(id::Int64, model::LBMmodel; initialSetup = false)
     # the velocity and angular velocity are updated, and the particle is moved (this is not necessary in the initial setup)
     if !initialSetup
         # these lines will only happen if id == 2 || id == 3
-        particle.position[1] = amplitudes[id] * cos(2π/periods[id] * model.time) + positions[id][1]
-        particle.velocity[1] = -amplitudes[id] * 2π/periods[id] * sin(2π/periods[id] * model.time)
+        particle.position[1] = amplitudes[id] * cos(2π/periods[id] * model.time + phases[id]) + positions[id][1]
+        particle.velocity[1] = -amplitudes[id] * 2π/periods[id] * sin(2π/periods[id] * model.time + phases[id])
     end
 
     # the second and third particles must always move, and the following lines need to be calculated for first particle during the initial setup

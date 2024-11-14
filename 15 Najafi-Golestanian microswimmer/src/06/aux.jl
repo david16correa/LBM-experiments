@@ -1,6 +1,6 @@
 #= ==========================================================================================
 =============================================================================================
-modifying methods to create this particular swimmer
+moedifying methods to create this particular swimmer
 =============================================================================================
 ========================================================================================== =#
 
@@ -16,12 +16,12 @@ function moveParticles!(id::Int64, model::LBMmodel; initialSetup = false)
 
     # the velocity and angular velocity are updated, and the particle is moved (this is not necessary in the initial setup)
     if !initialSetup
-        # these lines will only happen if id == 2 || id == 3
-        particle.position[1] = amplitudes[id] * cos(2π/periods[id] * model.time) + positions[id][1]
-        particle.velocity[1] = -amplitudes[id] * 2π/periods[id] * sin(2π/periods[id] * model.time)
+        # these lines will only happen if id == 2
+        particle.position[1] = amplitude * cos(2π/period * model.time) + positions[2][1]
+        particle.velocity[1] = -amplitude * 2π/period * sin(2π/period * model.time)
     end
 
-    # the second and third particles must always move, and the following lines need to be calculated for first particle during the initial setup
+    # the second particle must always move, and the following lines need to be calculated for first particle during the initial setup
 
     #= if particleMoved =#
         # the particle discretisation on the lattice is updated
