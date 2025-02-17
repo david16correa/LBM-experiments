@@ -21,5 +21,5 @@ coupleForces = false;
 scheme = :ladd;
 
 # simulation
-simulationTime = 5e3; # μs
-ticksBetweenSaves = 10 |> snapshots -> simulationTime / latticeParameter / snapshots |> round |> Int64; # (about) 10 snapshots are saved
+simulationTime = 20e3; # μs
+ticksBetweenSaves = 100 |> snapshots -> simulationTime / latticeParameter / snapshots |> round |> Int64; # (about) 10 snapshots are saved
