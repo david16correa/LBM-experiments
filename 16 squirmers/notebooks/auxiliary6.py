@@ -32,13 +32,119 @@ formatter.set_powerlimits((-2, 2))  # Sets limits for when to use scientific not
 # ---------------------------------------------------------------------------------------------
 # ------------------------------------------ methods ------------------------------------------
 # ---------------------------------------------------------------------------------------------
-def fluidOverviewZ(bigDf, title, level=0):
-    minZ = bigDf.query(f"coordinate_z >= {level}").coordinate_z.min()
-    df = bigDf.query(f"coordinate_z == {minZ}").reset_index().set_index(['id_x','id_y'])
-#     df = df.query('coordinate_y <= 10 & coordinate_y >= -10')
+def fluidOverviewX(bigDf, title, level=0):
+    minX = bigDf.query(f"coordinate_x >= {level}").coordinate_x.min()
+    if math.isnan(minX):
+        minX = bigDf.query(f"coordinate_x < {level}").coordinate_x.max()
+    df = bigDf.query(f"coordinate_x == {minX}").reset_index().set_index(['id_y','id_z'])
+
     # figure preparation
-    # fig, axes = plt.subplots(figsize = (5,2.5))
-    fig, axes = plt.subplots(1, 2, figsize = (5.,2.5))
+#     fig, axes = plt.subplots(figsize = (5,2.5))
+    fig, axes = plt.subplots(1, 2, figsize = (5.5,2.5))
+
+
+#     fig.suptitle(f"$t = {df.time.values[0]:.2f}$", fontsize=16)
+    fig.suptitle(title, fontsize=16)
+    fig.subplots_adjust(right=0.875)  # Adjust the right space to make room for the colorbar
+
+    # Create a meshgrid for plotting
+    x_unique = df['coordinate_y'].unique()
+    y_unique = df['coordinate_z'].unique()
+    X, Y = np.meshgrid(x_unique, y_unique)
+    
+    xmax = x_unique.max()
+    xmin = x_unique.min()
+    ymax = y_unique.max()
+    ymin = y_unique.min()
+
+    # first plot
+    upperLim = 1e-3
+    lowerLim = 0.
+    cmap = plt.get_cmap('cividis')
+    norm = plt.Normalize(lowerLim, upperLim)
+
+    axes[0].streamplot(X, Y, 
+        df.fluidVelocity_y.unstack().values.transpose(),
+        df.fluidVelocity_z.unstack().values.transpose(),
+        density=0.85, linewidth=0.5, color="black",
+    )
+    
+    
+    axes[0].pcolormesh(X, Y,
+        np.sqrt(df.fluidVelocity_x**2 + df.fluidVelocity_y**2 + df.fluidVelocity_z**2).unstack().values.transpose(),
+        vmin=lowerLim,
+        vmax=upperLim,
+        cmap=cmap, alpha = 0.85
+    );
+#     axes[0].tick_params(labelbottom=False)
+
+    axes[0].set_xticks([xmin, 0,xmax])
+    axes[0].set_xticklabels([f'{xmin:.0f}', 0,f'{xmax:.0f}'])
+    axes[0].set_xlabel("$y ~ (\\mathrm{\\mu m})$")
+    axes[0].set_yticks([ymin, 0, ymax])
+    axes[0].set_yticklabels([f'{ymin:.0f}', 0,f'{ymax:.0f}'])
+    axes[0].set_ylabel("$z ~ (\\mathrm{\\mu m})$")
+    # axes[0].tick_params(labelbottom=False)
+    
+    cbar_ax = fig.add_axes([0.9, 0.55, 0.025, 0.3])  # [left, bottom, width, height] for the colorbar
+#     cbar_ax = fig.add_axes([0.9, 0.15, 0.025, 0.7])  # [left, bottom, width, height] for the colorbar
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cbar_ax, alpha=0.85)
+    cbar.set_label(label='$\\mathbf{u}$', fontsize=16)
+#     cbar.set_label(label='$|\\mathbf{u}| ~ \\left(10^{-3}~\\mathrm{mm}/\\mathrm{s}\\right)$', fontsize=16)
+    cbar.ax.tick_params(labelsize=15)
+
+    custom_ticks = np.array([lowerLim, upperLim/2, upperLim])
+    cbar.set_ticks(custom_ticks)
+    cbar.set_ticklabels([f'{tick:.4f}' for tick in custom_ticks])
+#     cbar.set_ticklabels(['$0$','$1.5$','$3$'])
+    
+    # bottom plot
+    epsilon = 0.001
+    upperLim = 1. + epsilon
+    lowerLim = 1. - epsilon
+    cmap = plt.get_cmap('seismic')
+    norm = plt.Normalize(lowerLim, upperLim)
+    axes[1].pcolormesh(X,Y,
+        df.massDensity.unstack().values.transpose(),
+        vmin=lowerLim,
+        vmax=upperLim,
+        cmap=cmap,
+    );
+    
+    axes[1].set_xticks([xmin, 0,xmax])
+    axes[1].set_xticklabels([f'{xmin:.0f}', 0,f'{xmax:.0f}'])
+    axes[1].set_xlabel("$y ~ (\\mathrm{\\mu m})$")
+    axes[1].set_yticks([ymin, 0, ymax])
+    axes[1].set_yticklabels([f'{ymin:.0f}', 0,f'{ymax:.0f}'])
+    axes[1].tick_params(labelleft=False)
+    # axes[1].set_ylabel("$y ~ (\\mathrm{\\mu m})$")
+
+    cbar_ax = fig.add_axes([0.9, 0.13, 0.025, 0.3])  # [left, bottom, width, height] for the colorbar
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cbar_ax)
+    cbar.set_label(label='$\\rho$', fontsize=16)
+    cbar.ax.tick_params(labelsize=15)
+
+    custom_ticks = np.array([lowerLim, 1 ,upperLim])
+    cbar.set_ticks(custom_ticks)
+    cbar.set_ticklabels(custom_ticks)
+    cbar.set_ticklabels([f'{tick:.3f}' for tick in custom_ticks])
+    
+    return fig, axes
+
+def fluidOverviewY(bigDf, title, level=0):
+    minY = bigDf.query(f"coordinate_y >= {level}").coordinate_y.min()
+    if math.isnan(minY):
+        minY = bigDf.query(f"coordinate_y < {level}").coordinate_y.max()
+    df = bigDf.query(f"coordinate_y == {minY}").reset_index().set_index(['id_x','id_z'])
+
+    # figure preparation
+#     fig, axes = plt.subplots(figsize = (5,2.5))
+    fig, axes = plt.subplots(1, 2, figsize = (5.5,2.5))
+
 
 #     fig.suptitle(f"$t = {df.time.values[0]:.2f}$", fontsize=16)
     fig.suptitle(title, fontsize=16)
@@ -46,31 +152,27 @@ def fluidOverviewZ(bigDf, title, level=0):
 
     # Create a meshgrid for plotting
     x_unique = df['coordinate_x'].unique()
-    y_unique = df['coordinate_y'].unique()
-
-    xmax, xmin = x_unique.max(), x_unique.min()
-    ymax, ymin = y_unique.max(), y_unique.min()
-
-    numx = len(x_unique)  # Number of unique x points
-    numy = len(y_unique)  # Number of unique y points
-
-    X, Y = np.meshgrid(
-        np.linspace(xmin, xmax, numx),
-        np.linspace(ymin, ymax, numy)
-    )
+    y_unique = df['coordinate_z'].unique()
+    X, Y = np.meshgrid(x_unique, y_unique)
+    
+    xmax = x_unique.max()
+    xmin = x_unique.min()
+    ymax = y_unique.max()
+    ymin = y_unique.min()
 
     # first plot
-    upperLim = 1e-6
+    upperLim = 1e-3
     lowerLim = 0.
     cmap = plt.get_cmap('cividis')
     norm = plt.Normalize(lowerLim, upperLim)
 
-    axes[0].streamplot(X, Y,
+    axes[0].streamplot(X, Y, 
         df.fluidVelocity_x.unstack().values.transpose(),
-        df.fluidVelocity_y.unstack().values.transpose(),
+        df.fluidVelocity_z.unstack().values.transpose(),
         density=0.85, linewidth=0.5, color="black",
     )
-
+    
+    
     axes[0].pcolormesh(X, Y,
         np.sqrt(df.fluidVelocity_x**2 + df.fluidVelocity_y**2 + df.fluidVelocity_z**2).unstack().values.transpose(),
         vmin=lowerLim,
@@ -84,8 +186,8 @@ def fluidOverviewZ(bigDf, title, level=0):
     axes[0].set_xlabel("$x ~ (\\mathrm{\\mu m})$")
     axes[0].set_yticks([ymin, 0, ymax])
     axes[0].set_yticklabels([f'{ymin:.0f}', 0,f'{ymax:.0f}'])
-    axes[0].set_ylabel("$y ~ (\\mathrm{\\mu m})$")
-    # axes[1].tick_params(labelbottom=False)
+    axes[0].set_ylabel("$z ~ (\\mathrm{\\mu m})$")
+    # axes[0].tick_params(labelbottom=False)
     
     cbar_ax = fig.add_axes([0.9, 0.55, 0.025, 0.3])  # [left, bottom, width, height] for the colorbar
 #     cbar_ax = fig.add_axes([0.9, 0.15, 0.025, 0.7])  # [left, bottom, width, height] for the colorbar
@@ -98,16 +200,11 @@ def fluidOverviewZ(bigDf, title, level=0):
 
     custom_ticks = np.array([lowerLim, upperLim/2, upperLim])
     cbar.set_ticks(custom_ticks)
-    # cbar.set_ticklabels([f'{tick:.4f}' for tick in custom_ticks])
-    cbar.set_ticklabels(['$0$','','$10^{-6}$'])
+    cbar.set_ticklabels([f'{tick:.4f}' for tick in custom_ticks])
+#     cbar.set_ticklabels(['$0$','$1.5$','$3$'])
     
     # bottom plot
-    squirmerRadius = 4;
-    # auxDf = df.query(f'coordinate_x**2 + coordinate_y**2 > {squirmerRadius}**2')
-    # realEpsilon = np.max([np.abs(df.massDensity.max() - 1), np.abs(df.massDensity.min() - 1)])
-    # epsilon = realEpsilon
-    # epsilon = 10**(np.round(np.log(realEpsilon)/np.log(10)))
-    epsilon = 1e-5
+    epsilon = 0.001
     upperLim = 1. + epsilon
     lowerLim = 1. - epsilon
     cmap = plt.get_cmap('seismic')
@@ -131,52 +228,54 @@ def fluidOverviewZ(bigDf, title, level=0):
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = fig.colorbar(sm, cax=cbar_ax)
-    cbar.set_label(label='$\\rho - 1$', fontsize=16)
+    cbar.set_label(label='$\\rho$', fontsize=16)
     cbar.ax.tick_params(labelsize=15)
 
     custom_ticks = np.array([lowerLim, 1 ,upperLim])
     cbar.set_ticks(custom_ticks)
     cbar.set_ticklabels(custom_ticks)
-    # cbar.set_ticklabels([f'{tick:.3f}' for tick in custom_ticks])
-    cbar.set_ticklabels(['$-10^{-5}$', '$0$','$10^{-5}$'])
+    cbar.set_ticklabels([f'{tick:.3f}' for tick in custom_ticks])
     
     return fig, axes
 
-def fluidOverviewX(bigDf, title, level = 0):
-    minX = bigDf.query(f"coordinate_x >= {level}").coordinate_x.min()
-    df = bigDf.query(f"coordinate_x == {minX}").reset_index().set_index(['id_z','id_y'])
-#     df = df.query('coordinate_y <= 10 & coordinate_y >= -10')
+def fluidOverviewZ(bigDf, title, level=0):
+    minZ = bigDf.query(f"coordinate_z >= {level}").coordinate_z.min()
+    if math.isnan(minZ):
+        minZ = bigDf.query(f"coordinate_z < {level}").coordinate_z.max()
+    df = bigDf.query(f"coordinate_z == {minZ}").reset_index().set_index(['id_x','id_y'])
+
     # figure preparation
-    # fig, axes = plt.subplots(figsize = (5,2.5))
-    fig, axes = plt.subplots(1, 2, figsize = (5.,2.5))
+#     fig, axes = plt.subplots(figsize = (5,2.5))
+    fig, axes = plt.subplots(1, 2, figsize = (5.5,2.5))
+
 
 #     fig.suptitle(f"$t = {df.time.values[0]:.2f}$", fontsize=16)
     fig.suptitle(title, fontsize=16)
     fig.subplots_adjust(right=0.875)  # Adjust the right space to make room for the colorbar
 
-
     # Create a meshgrid for plotting
-    x_unique = df['coordinate_z'].unique()
+    x_unique = df['coordinate_x'].unique()
     y_unique = df['coordinate_y'].unique()
     X, Y = np.meshgrid(x_unique, y_unique)
-
+    
     xmax = x_unique.max()
     xmin = x_unique.min()
     ymax = y_unique.max()
     ymin = y_unique.min()
 
     # first plot
-    upperLim = 1e-6
+    upperLim = 1e-3
     lowerLim = 0.
     cmap = plt.get_cmap('cividis')
     norm = plt.Normalize(lowerLim, upperLim)
 
-    axes[0].streamplot(X, Y,
-        df.fluidVelocity_z.unstack().values.transpose(),
+    axes[0].streamplot(X, Y, 
+        df.fluidVelocity_x.unstack().values.transpose(),
         df.fluidVelocity_y.unstack().values.transpose(),
         density=0.85, linewidth=0.5, color="black",
     )
-
+    
+    
     axes[0].pcolormesh(X, Y,
         np.sqrt(df.fluidVelocity_x**2 + df.fluidVelocity_y**2 + df.fluidVelocity_z**2).unstack().values.transpose(),
         vmin=lowerLim,
@@ -187,11 +286,11 @@ def fluidOverviewX(bigDf, title, level = 0):
 
     axes[0].set_xticks([xmin, 0,xmax])
     axes[0].set_xticklabels([f'{xmin:.0f}', 0,f'{xmax:.0f}'])
-    axes[0].set_xlabel("$z ~ (\\mathrm{\\mu m})$")
+    axes[0].set_xlabel("$x ~ (\\mathrm{\\mu m})$")
     axes[0].set_yticks([ymin, 0, ymax])
     axes[0].set_yticklabels([f'{ymin:.0f}', 0,f'{ymax:.0f}'])
     axes[0].set_ylabel("$y ~ (\\mathrm{\\mu m})$")
-    # axes[1].tick_params(labelbottom=False)
+    # axes[0].tick_params(labelbottom=False)
     
     cbar_ax = fig.add_axes([0.9, 0.55, 0.025, 0.3])  # [left, bottom, width, height] for the colorbar
 #     cbar_ax = fig.add_axes([0.9, 0.15, 0.025, 0.7])  # [left, bottom, width, height] for the colorbar
@@ -204,16 +303,11 @@ def fluidOverviewX(bigDf, title, level = 0):
 
     custom_ticks = np.array([lowerLim, upperLim/2, upperLim])
     cbar.set_ticks(custom_ticks)
-    # cbar.set_ticklabels([f'{tick:.4f}' for tick in custom_ticks])
-    cbar.set_ticklabels(['$0$','','$10^{-6}$'])
+    cbar.set_ticklabels([f'{tick:.4f}' for tick in custom_ticks])
+#     cbar.set_ticklabels(['$0$','$1.5$','$3$'])
     
     # bottom plot
-    squirmerRadius = 4;
-    # auxDf = df.query(f'coordinate_x**2 + coordinate_y**2 > {squirmerRadius}**2')
-    # realEpsilon = np.max([np.abs(df.massDensity.max() - 1), np.abs(df.massDensity.min() - 1)])
-    # epsilon = realEpsilon
-    # epsilon = 10**(np.round(np.log(realEpsilon)/np.log(10)))
-    epsilon = 1e-5
+    epsilon = 0.001
     upperLim = 1. + epsilon
     lowerLim = 1. - epsilon
     cmap = plt.get_cmap('seismic')
@@ -227,7 +321,7 @@ def fluidOverviewX(bigDf, title, level = 0):
     
     axes[1].set_xticks([xmin, 0,xmax])
     axes[1].set_xticklabels([f'{xmin:.0f}', 0,f'{xmax:.0f}'])
-    axes[1].set_xlabel("$z ~ (\\mathrm{\\mu m})$")
+    axes[1].set_xlabel("$x ~ (\\mathrm{\\mu m})$")
     axes[1].set_yticks([ymin, 0, ymax])
     axes[1].set_yticklabels([f'{ymin:.0f}', 0,f'{ymax:.0f}'])
     axes[1].tick_params(labelleft=False)
@@ -237,16 +331,16 @@ def fluidOverviewX(bigDf, title, level = 0):
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = fig.colorbar(sm, cax=cbar_ax)
-    cbar.set_label(label='$\\rho - 1$', fontsize=16)
+    cbar.set_label(label='$\\rho$', fontsize=16)
     cbar.ax.tick_params(labelsize=15)
 
     custom_ticks = np.array([lowerLim, 1 ,upperLim])
     cbar.set_ticks(custom_ticks)
     cbar.set_ticklabels(custom_ticks)
-    # cbar.set_ticklabels([f'{tick:.3f}' for tick in custom_ticks])
-    cbar.set_ticklabels(['$-10^{-5}$', '$0$','$10^{-5}$'])
+    cbar.set_ticklabels([f'{tick:.3f}' for tick in custom_ticks])
     
     return fig, axes
+
 
 def stressTensorOverview(df):
     # setting up stuff
@@ -296,23 +390,23 @@ def particleTrjOverview(df):
 
     df1 = df.query('particleId==1')
 
-    # axes[0].plot(df.time, np.log(df.position_x)/np.log(10), label='$\\mathrm{log}_{10} x$')
+# axes[0].plot(df.time, np.log(df.position_x)/np.log(10), label='$\\mathrm{log}_{10} x$')
     axes[0].plot(df1.time, df1.position_x, label='$x - x_0$', alpha = 1.0)
-    axes[0].plot(df1.time, df1.position_y + 13.5, label='$y - y_0$', alpha = 1.0)
+    axes[0].plot(df1.time, df1.position_y, label='$y - y_0$', alpha = 1.0)
     axes[0].plot(df1.time, df1.position_z, label='$z - z_0$', alpha = 1.0)
     axes[0].legend()
-    # axes[0].set_ylabel("$q$")
+# axes[0].set_ylabel("$q$")
 
     axes[1].plot(df1.time, df1.velocity_x, label='$\\dot{x}$', alpha = 1.0)
     axes[1].plot(df1.time, df1.velocity_y, label='$\\dot{y}$', alpha = 1.0)
     axes[1].plot(df1.time, df1.velocity_z, label='$\\dot{z}$', alpha = 1.0)
     axes[1].legend()
-    # axes[1].set_ylabel("$\\dot{q}$")
+# axes[1].set_ylabel("$\\dot{q}$")
 
-    # for i in range(len(axes)):
-    #     ax = axes.flatten()[i]
-    #     ax.set_xlabel("$t$")
-    #     ax.yaxis.set_major_formatter(formatter)
-    #     ax.legend()
-    #
+# for i in range(len(axes)):
+#     ax = axes.flatten()[i]
+#     ax.set_xlabel("$t$")
+#     ax.yaxis.set_major_formatter(formatter)
+#     ax.legend()
+#
     return fig, axes
