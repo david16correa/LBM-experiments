@@ -24,7 +24,7 @@ using Pkg; Pkg.activate(envPath)
 # packages
 using LBMengine
 
-# parameters and auxilary functions
+# parameters and auxiliary functions
 include("$srcPath/params.jl")
 
 #= ==========================================================================================
@@ -61,14 +61,24 @@ addSquirmer!(model;
     coupleForces = true,
     coupleTorques = false,
 );
-addLinearBond!(model,1,2; hookConstant = hookConstant)
-addLinearBond!(model,2,3; hookConstant = hookConstant)
+addLinearBond!(model,1,2; hookConstant = hookConstant_linear)
+addLinearBond!(model,2,3; hookConstant = hookConstant_linear)
+addPolarBond!(model,1,2,3; hookConstant = hookConstant_polar)
 
 println("running simulation..."); flush(stdout);
 @time LBMpropagate!(model; verbose = true, simulationTime = simulationTime, ticksSaved = ticksSaved);
 #
 println("plotting the mass density and fluid velocity..."); flush(stdout);
-plotMassDensity(model); plotFluidVelocity(model);
+try
+    plotMassDensity(model);
+catch
+    println("plotMassDensity() failed!")
+end
+try
+    plotFluidVelocity(model);
+catch
+    println("plotFluidVelocity() failed!")
+end
 
 println("moving data..."); flush(stdout);
 mv("$srcPath/output.lbm", "$(outputDir)/$(src_n)")

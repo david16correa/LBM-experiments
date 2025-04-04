@@ -24,7 +24,7 @@ using Pkg; Pkg.activate(envPath)
 # packages
 using LBMengine
 
-# parameters and auxilary functions
+# parameters and auxiliarauxilaryy functions
 include("$srcPath/params.jl")
 
 #= ==========================================================================================
@@ -63,7 +63,6 @@ addSquirmer!(model;
 );
 addLinearBond!(model,1,2; hookConstant = hookConstant)
 addLinearBond!(model,2,3; hookConstant = hookConstant)
-addPolarBond!(model,1,2,3; hookConstant = hookConstant)
 
 println("running simulation..."); flush(stdout);
 @time LBMpropagate!(model; verbose = true, simulationTime = simulationTime, ticksSaved = ticksSaved);
