@@ -32,7 +32,7 @@ formatter.set_powerlimits((-2, 2))  # Sets limits for when to use scientific not
 # ---------------------------------------------------------------------------------------------
 # ------------------------------------------ methods ------------------------------------------
 # ---------------------------------------------------------------------------------------------
-def fluidOverview(df, particleDf, title):
+def fluidOverview(df, particleDf, title, upperLim = 1e-3, epsilon = 1e-3):
 #     df = df.query('coordinate_y <= 10 & coordinate_y >= -10')
     # figure preparation
 #     fig, axes = plt.subplots(figsize = (5,2.5))
@@ -54,7 +54,7 @@ def fluidOverview(df, particleDf, title):
     ymin = y_unique.min()
 
     # first plot
-    upperLim = 1e-3
+    # upperLim = 1e-3
     lowerLim = 0.
     cmap = plt.get_cmap('cividis')
     norm = plt.Normalize(lowerLim, upperLim)
@@ -96,7 +96,7 @@ def fluidOverview(df, particleDf, title):
 #     cbar.set_ticklabels(['$0$','$1.5$','$3$'])
     
     # bottom plot
-    epsilon = 1e-3
+    # epsilon = 1e-3
     upperLim = 1. + epsilon
     lowerLim = 1. - epsilon
     cmap = plt.get_cmap('seismic')
