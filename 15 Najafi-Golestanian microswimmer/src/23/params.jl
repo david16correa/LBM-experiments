@@ -6,7 +6,6 @@ params
 
 # space
 xlims = (-100,100); # μm
-ylims = (-50, 50); # μm
 dims = 2;
 
 # fluid
