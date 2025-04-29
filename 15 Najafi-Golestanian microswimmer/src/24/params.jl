@@ -5,8 +5,7 @@ params
 ========================================================================================== =#
 
 # space
-xlims = (-150,150); # μm
-ylims = (-50,50); # μm
+xlims = (-100,100); # μm
 dims = 2;
 
 # fluid
@@ -14,20 +13,22 @@ viscosity = 1; # (μm)²/(μs)
 
 # beads
 radius = 3; # μm
-nBeads = 15
-xs = range(stop=0, step=radius*2.3, length=nBeads) |> collect # μm
+separation = 2.3*radius # μm
 coupleForces = true;
-coupleTorques = true;
+coupleTorques = false;
 
-# squirmer
-swimmingSpeed = 1e-3;
-beta = 0;
-swimmingDirection = [1,0];
+# moving arms
+bondPairs = [(1,2), (2,3)]
 
-# bonds
-bondPairs = [(id, id+1) for id in 1:nBeads-1]
-stiffness = 1 # mN/m
+period, amplitude = 1e1, 1e-1 # μs, μm
+equilibriumDisplacements = [
+    t -> separation + amplitude * sin(2*pi/period * t - pi/2) # μm
+    t -> separation + amplitude * sin(2*pi/period * t) # μm
+]
+# initial positions
+xs = [equilibriumDisplacements[1](0); 0; -equilibriumDisplacements[2](0)] # μm
+ys = [0 0 0] # μm
 
 # simulation
-simulationTime = 5e3; # μs
-ticksSaved = 10;
+simulationTime = 20e3; # μs
+ticksSaved = 100;
