@@ -12,7 +12,7 @@ dims = 2;
 viscosity = 1; # (μm)²/(μs)
 
 # beads
-nLinks = 5;
+nLinks = 3;
 nBeads = 2*nLinks+1;
 radius = 2; # μm
 equilibriumDisplacement = 2.3*radius
@@ -33,5 +33,5 @@ equilibriumAngle = pi # rad
 magneticField = [0, 5] # mT
 
 # simulation
-simulationTime = 40e3; # μs
+simulationTime = 100e3; # μs
 ticksSaved = 100;

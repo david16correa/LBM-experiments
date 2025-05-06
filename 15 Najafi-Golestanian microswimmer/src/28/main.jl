@@ -25,6 +25,7 @@ using Pkg; Pkg.activate(envPath)
 using LBMengine
 
 # parameters and auxiliarauxilaryy functions
+include("$srcPath/aux.jl")
 include("$srcPath/params.jl")
 
 #= ==========================================================================================
@@ -40,23 +41,18 @@ model = modelInit(;
     dims = dims,
     saveData = true
 );
-for x in xs
+for Id in eachindex(xs)
     addBead!(model;
         radius = radius,
-        position = [x, abs(x)*rand()*1e-1], # particles are initially placed in a very open V shape
+        position = [xs[Id], ys[Id]],
         coupleForces = coupleForces,
         coupleTorques = coupleTorques,
     );
 end
-for pair in bondPairs
-    addLinearBond!(model, pair...; stiffness=stiffness, equilibriumDisplacement=equilibriumDisplacement)
+for Id in eachindex(bondPairs)
+    addAuxBond!(model, bondPairs[Id]...; stiffness=10, equilibriumDisplacement = equilibriumDisplacements[Id])
 end
-for triplet in bondTriplets
-    addPolarBond!(model, triplet...; equilibriumAngle=equilibriumAngle)
-end
-#
-addDipoles!(model; magneticField = magneticField)
-addWCA!(model)
+addPolarBond!(model, 1,2,3; stiffness=10) # to keep all particles aligned
 
 println("running simulation..."); flush(stdout);
 @time LBMpropagate!(model; verbose = true, simulationTime = simulationTime, ticksSaved = ticksSaved);

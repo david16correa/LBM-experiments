@@ -12,7 +12,7 @@ dims = 2;
 viscosity = 1; # (μm)²/(μs)
 
 # beads
-nLinks = 5;
+nLinks = 2;
 nBeads = 2*nLinks+1;
 radius = 2; # μm
 equilibriumDisplacement = 2.3*radius

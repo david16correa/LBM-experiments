@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+dirs=(
+  06
+  07
+  # 08
+)
+for Id in "${dirs[@]}"; do
+    echo "Running script $Id/main.jl..."
+    julia "$Id/main.jl" > "$Id/out.out" 2>&1
+done
+
+# julia 05/main.jl > 05/out.out 2>&1
